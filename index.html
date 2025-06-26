@@ -5,73 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>수어 단어 학습(음식)</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #f8f8f8;
-      text-align: center;
-      margin: 0;
-    }
-    #videoContainer {
-      background: #fff;
-      border: 1px solid #ddd;
-      padding: 10px;
-      margin: 0 auto 20px;
-      max-width: 400px;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    video {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 4px;
-    }
-    button {
-      padding: 8px 12px;
-      margin: 5px;
-      font-size: 14px;
-      cursor: pointer;
-      border: 1px solid #ccc;
-      background: #fff;
-      border-radius: 4px;
-      box-sizing: border-box;
-    }
-    #answer {
-      display: none;
-      margin-top: 10px;
-      font-weight: bold;
-      color: #333;
-    }
-    #speedControls {
-      margin-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 8px;
-    }
-    #speedControls button {
-      flex: 1 1 auto;
-      min-width: 60px;
-      padding: 6px 10px;
-      font-size: 13px;
-    }
-    /* 버튼 컨테이너 이하 중앙 정렬 */
-    .controls {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
-    .controls button {
-      flex: 1 1 auto;
-      min-width: 100px;
-      max-width: 140px;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f8f8f8; text-align: center; margin: 0; }
+    #pageTitle { margin-bottom: 20px; font-size: 24px; }
+    #videoContainer { background: #fff; border: 1px solid #ddd; padding: 10px; margin: 0 auto 20px; max-width: 400px; width: 100%; box-sizing: border-box; transition: all 0.3s ease; }
+    #videoContainer.zoomed { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 90vw; max-width: none; }
+    video { width: 100%; height: auto; display: block; border-radius: 4px; }
+    #speedControls { margin-top: 10px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+    #speedControls button { flex: 1 1 auto; min-width: 60px; padding: 6px 10px; font-size: 13px; }
+    .controls { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .controls button { flex: 1 1 auto; min-width: 80px; max-width: 140px; padding: 8px 12px; font-size: 14px; cursor: pointer; border: 1px solid #ccc; background: #fff; border-radius: 4px; box-sizing: border-box; }
+    #answer { display: none; margin-top: 10px; font-weight: bold; color: #333; }
+    #counter { text-align: center; margin-top: 10px; font-size: 14px; color: #555; }
   </style>
 </head>
 <body>
+  <h1 id="pageTitle">수어 단어 학습(음식)</h1>
   <div id="videoContainer">
     <video id="mainVideo" autoplay loop muted preload="metadata"></video>
     <div id="speedControls">
@@ -84,8 +32,11 @@
   </div>
   <div class="controls">
     <button id="answerBtn">정답보기</button>
+    <button id="prevBtn">이전</button>
     <button id="nextBtn">다음</button>
+    <button id="zoomBtn">확대</button>
   </div>
+  <p id="counter"></p>
 
   <script>
     // 학습용 영상 리스트 (추가 시 여기만 수정)
@@ -93,10 +44,10 @@
       '사과.mp4','옥수수.mp4','껌.mp4','고추.mp4','보리.mp4',
       '돼지갈비.mp4','콜라.mp4','잡채.mp4','삼겹살.mp4','떡볶이.mp4','자장면.mp4',
       '콩나물무침.mp4','계란.mp4','배추.mp4','식용유.mp4','짬뽕.mp4','설탕.mp4',
-      '물.mp4','껌.mp4','소주.mp4','수박.mp4','빵.mp4'
+      '물.mp4','소주.mp4','수박.mp4','빵.mp4'
     ];
 
-    // 랜덤 순서 생성
+    // 순서 랜덤 생성
     const order = videoFiles.slice();
     for (let i = order.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -107,7 +58,15 @@
     const videoEl = document.getElementById('mainVideo');
     const answerEl = document.getElementById('answer');
     const answerBtn = document.getElementById('answerBtn');
+    const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
+    const zoomBtn = document.getElementById('zoomBtn');
+    const counterEl = document.getElementById('counter');
+    let isZoomed = false;
+
+    function updateCounter() {
+      counterEl.textContent = `총 ${order.length}개 중 ${currentIndex + 1}번째`;
+    }
 
     function loadVideo(idx) {
       const file = order[idx];
@@ -115,10 +74,16 @@
       videoEl.playbackRate = 1.0;
       answerEl.textContent = '정답: ' + file.replace(/\.mp4$/i, '');
       answerEl.style.display = 'none';
+      updateCounter();
     }
 
     answerBtn.onclick = () => {
       answerEl.style.display = answerEl.style.display === 'block' ? 'none' : 'block';
+    };
+
+    prevBtn.onclick = () => {
+      currentIndex = (currentIndex - 1 + order.length) % order.length;
+      loadVideo(currentIndex);
     };
 
     nextBtn.onclick = () => {
@@ -126,11 +91,21 @@
       loadVideo(currentIndex);
     };
 
-    // 속도 조절 버튼
+    zoomBtn.onclick = () => {
+      const container = document.getElementById('videoContainer');
+      if (!isZoomed) {
+        container.classList.add('zoomed');
+        zoomBtn.textContent = '축소';
+      } else {
+        container.classList.remove('zoomed');
+        zoomBtn.textContent = '확대';
+      }
+      isZoomed = !isZoomed;
+    };
+
     document.querySelectorAll('#speedControls button').forEach(btn => {
       btn.onclick = () => {
-        const speed = parseFloat(btn.dataset.speed);
-        videoEl.playbackRate = speed;
+        videoEl.playbackRate = parseFloat(btn.dataset.speed);
       };
     });
 
@@ -142,9 +117,11 @@
       else if (e.key === '4') videoEl.playbackRate = 1.0;
       else if (e.key.toLowerCase() === 'q') answerBtn.click();
       else if (e.key.toLowerCase() === 'e') nextBtn.click();
+      else if (e.key.toLowerCase() === 'w') prevBtn.click();
+      else if (e.key.toLowerCase() === 'z') zoomBtn.click();
     });
 
-    // 초기 실행
+    // 초기 로드
     loadVideo(currentIndex);
   </script>
 </body>
