@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>수어 단어 학습(음식)</title>
+  <style>
+    body { font-family: sans-serif; background-color: #f0f0f0; margin: 0; padding: 20px; }
+    .controls { text-align: center; margin-bottom: 20px; }
+    .controls button { padding: 8px 16px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    .controls button:hover { background: #f0f0f0; }
+    .grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 15px; max-width: 900px; margin: auto; }
+    .video-box { background: #fff; padding: 10px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); cursor: pointer; }
+    video { width: 100%; border-radius: 8px; }
+    .label { margin-top: 8px; font-weight: bold; font-size: 16px; text-align: center; user-select: none; color: #888; cursor: default; }
+    .label.hidden { color: #888; cursor: pointer; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 999; }
+    .modal video { width: 80%; max-height: 80%; }
+  </style>
+</head>
+<body>
+
+<div class="controls">
+  <button id="showAllBtn">전체보기</button>
+</div>
+
+<h2 style="text-align:center;">수어 단어 학습(음식)</h2>
+
+<div class="grid"></div>
+
+<div class="modal" id="videoModal" onclick="closeModal()">
+  <video id="modalVideo" controls autoplay loop muted></video>
+</div>
+
+<script>
+  // 영상 파일명만 배열에 추가하면 자동으로 반영됩니다.
+  const videoFiles = [
+    '고구마.mp4',
+    '사과.mp4',
+    '옥수수.mp4',
+    '껌1.mp4',
+    '고추.mp4',
+    '보리.mp4',
+    '돼지갈비.mp4',
+    '콜라.mp4',
+    '잡채.mp4',
+    '삼겹살.mp4',
+    '떡볶이.mp4',
+    '자장면.mp4',
+    '콩나물무침.mp4',
+    '계란.mp4',
+    '배추.mp4',
+    '식용유.mp4',
+    '짬뽕.mp4',
+    '설탕.mp4',
+    '물.mp4',
+    '껌.mp4',
+    '소주.mp4',
+    '수박.mp4',
+    '빵.mp4'
+  ];
+
+  // 배열 셔플 함수
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+
+  // 모달 제어
+  function openModal(src) {
+    const modal = document.getElementById('videoModal');
+    const vid = document.getElementById('modalVideo');
+    modal.style.display = 'flex';
+    vid.src = src;
+    vid.play();
+  }
+  function closeModal() {
+    const modal = document.getElementById('videoModal');
+    const vid = document.getElementById('modalVideo');
+    modal.style.display = 'none';
+    vid.pause();
+    vid.src = '';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const grid = document.querySelector('.grid');
+    // 로드 시 무작위 정렬
+    shuffle(videoFiles);
+
+    // 그리드 생성
+    videoFiles.forEach(file => {
+      const labelText = file.replace(/\.[^.]+$/, '');
+      const srcPath = `videos/${file}`;
+      const box = document.createElement('div');
+      box.className = 'video-box';
+      box.onclick = () => openModal(srcPath);
+
+      const vid = document.createElement('video');
+      vid.src = srcPath;
+      vid.autoplay = true;
+      vid.loop = true;
+      vid.muted = true;
+
+      const lbl = document.createElement('div');
+      lbl.className = 'label hidden';
+      lbl.textContent = labelText;
+      lbl.onclick = e => { e.stopPropagation(); lbl.classList.remove('hidden'); };
+
+      box.appendChild(vid);
+      box.appendChild(lbl);
+      grid.appendChild(box);
+    });
+
+    // 전체보기 버튼 기능
+    document.getElementById('showAllBtn').onclick = () => {
+      document.querySelectorAll('.label').forEach(lbl => lbl.classList.remove('hidden'));
+    };
+  });
+</script>
+
+</body>
+</html>
