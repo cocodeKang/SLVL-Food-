@@ -10,26 +10,32 @@
       padding: 20px;
       background: #f8f8f8;
       text-align: center;
+      margin: 0;
     }
     #videoContainer {
       background: #fff;
       border: 1px solid #ddd;
       padding: 10px;
-      display: inline-block;
-      margin-bottom: 20px;
+      margin: 0 auto 20px;
+      max-width: 400px;
+      width: 100%;
+      box-sizing: border-box;
     }
     video {
       width: 100%;
-      max-width: 400px;
       height: auto;
       display: block;
-      margin: 0 auto 10px;
+      border-radius: 4px;
     }
     button {
-      padding: 8px 16px;
+      padding: 8px 12px;
       margin: 5px;
       font-size: 14px;
       cursor: pointer;
+      border: 1px solid #ccc;
+      background: #fff;
+      border-radius: 4px;
+      box-sizing: border-box;
     }
     #answer {
       display: none;
@@ -39,10 +45,29 @@
     }
     #speedControls {
       margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
     }
     #speedControls button {
-      padding: 4px 12px;
+      flex: 1 1 auto;
+      min-width: 60px;
+      padding: 6px 10px;
       font-size: 13px;
+    }
+    /* 버튼 컨테이너 이하 중앙 정렬 */
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .controls button {
+      flex: 1 1 auto;
+      min-width: 100px;
+      max-width: 140px;
     }
   </style>
 </head>
@@ -50,7 +75,6 @@
   <div id="videoContainer">
     <video id="mainVideo" autoplay loop muted preload="metadata"></video>
     <div id="speedControls">
-      <strong>재생 속도:</strong>
       <button data-speed="0.25">×0.25</button>
       <button data-speed="0.5">×0.5</button>
       <button data-speed="0.75">×0.75</button>
@@ -58,7 +82,7 @@
     </div>
     <p id="answer"></p>
   </div>
-  <div>
+  <div class="controls">
     <button id="answerBtn">정답보기</button>
     <button id="nextBtn">다음</button>
   </div>
